@@ -38,8 +38,10 @@ export default{
                 this.answerSubmitted = true;
                 if(this.chosenAnswer === this.correctAnswer) {
                     this.winCount++;
+                    sessionStorage.setItem("winCount", JSON.stringify(this.winCount));
                 } else {
                     this.loseCount++;
+                    sessionStorage.setItem("loseCount",JSON.stringify(this.loseCount))
                 }
             }
         },
@@ -57,7 +59,9 @@ export default{
     },
 
     created(){
-        this.getNewQuestion()
+        this.winCount= sessionStorage.getItem("winCount") ? JSON.parse(sessionStorage.getItem("winCount")) : this.winCount;
+        this.loseCount= sessionStorage.getItem("loseCount") ? JSON.parse (sessionStorage.getItem("loseCount")) : this.loseCount;
+        this.getNewQuestion();
     }
 }
 
