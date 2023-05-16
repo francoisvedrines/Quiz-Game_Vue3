@@ -8,6 +8,8 @@ export default{
             question: String,
             incorrectAnswers:[],
             correctAnswer:[],
+            chosenAnswer: undefined,
+            answerSubmitted: false
         }
     },
 
@@ -21,16 +23,36 @@ export default{
         }
     },
 
+    methods:{
+        submitAnswer(){
+            if(!this.chosenAnswer){
+                alert('Pick on of the options');
+            } else {
+                this.answerSubmitted = true;
+                if(this.chosenAnswer === this.correctAnswer) {
+                    console.log("it's right");
+                } else {
+                    console.log("it's wrong");
+                }
+            }
+        },
+        getNewQuestion(){
+            this.answerSubmitted = false;
+            this.chosenAnswer = undefined;
+            this.question = undefined;
+            this.axios.get('https://opentdb.com/api.php?amount=1&category=18')
+            .then((response) => {
+                this.question = response.data.results[0].question;
+                this.incorrectAnswers= response.data.results[0].incorrect_answers;
+                this.correctAnswer = response.data.results[0].correct_answer;
+            }) 
+        }
+    },
+
     created(){
-        this.axios.get('https://opentdb.com/api.php?amount=1&category=18')
-        .then((response) => {
-        this.question = response.data.results[0].question;
-        this.incorrectAnswers= response.data.results[0].incorrect_answers;
-        this.correctAnswer = response.data.results[0].correct_answer;
-        })
+        this.getNewQuestion()
     }
 }
-
 
 </script>
 
@@ -38,16 +60,44 @@ export default{
     
 <div>    
     <h1 v-html="this.question"></h1>
-    <template v-for="answer in this.answers" :key="answer">
-        <input 
-            type="radio" 
-            name="options" 
-            value="answer">
 
-        <label v-html="answer"> </label><br>
+    <template v-if="this.question">
+        <template v-for="answer in this.answers" :key="answer">
+            <input 
+                :disabled="this.answerSubmitted"
+                type="radio" 
+                name="options" 
+                :value="answer"
+                v-model="chosenAnswer"
+            >
+
+            <label v-html="answer"> </label><br>
+        </template>
+
+        <button
+            v-if="!this.answerSubmitted" 
+            @click="this.submitAnswer()" 
+            class="send" 
+            type="button">Send
+        </button>
+
+
+        <section class="result" v-if="answerSubmitted">
+            <h4 v-if="this.chosenAnswer === this.correctAnswer"
+                v-html=" '&#9989; Congratulations, the answer ' + this.chosenAnswer + ' is correct.'"
+            > 
+            </h4>
+
+            <h4 v-else
+            v-html="`&#10060; I'm sorry, you picked the wrong answer. The correct is `+ this.correctAnswer "
+            > 
+            </h4>
+
+            <button @click="this.getNewQuestion()" class="send" type="button">Next question</button>
+
+        </section>
+
     </template>
-
-    <button class="send" type="button">Send</button>
 </div>
 
 </template>
