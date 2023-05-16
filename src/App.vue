@@ -1,7 +1,12 @@
 <script>
 
+import ScoreBoard from './components/ScoreBoard.vue'
+
 export default{
     name: 'app',
+    components:{
+        ScoreBoard
+    },
 
     data(){
         return{
@@ -9,7 +14,9 @@ export default{
             incorrectAnswers:[],
             correctAnswer:[],
             chosenAnswer: undefined,
-            answerSubmitted: false
+            answerSubmitted: false,
+            winCount: 0,
+            loseCount: 0
         }
     },
 
@@ -30,9 +37,9 @@ export default{
             } else {
                 this.answerSubmitted = true;
                 if(this.chosenAnswer === this.correctAnswer) {
-                    console.log("it's right");
+                    this.winCount++;
                 } else {
-                    console.log("it's wrong");
+                    this.loseCount++;
                 }
             }
         },
@@ -59,6 +66,9 @@ export default{
 <template>
     
 <div>    
+
+    <ScoreBoard :winCount="this.winCount" :loseCount="this.loseCount"/>
+
     <h1 v-html="this.question"></h1>
 
     <template v-if="this.question">
